@@ -1,6 +1,6 @@
 // deno-lint-ignore no-explicit-any
 function sendData(coords, label1, label2, zoom) {
-    fetch('http://deno2-web-server-template-production-a97d.up.railway.app/api/update', {
+    fetch('https://ra-api.up.railway.app/api/update', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
