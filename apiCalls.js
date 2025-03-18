@@ -1,6 +1,6 @@
 // deno-lint-ignore no-explicit-any
 function sendData(coords, label1, label2, zoom) {
-    fetch('https://ra-api.up.railway.app/api/update', {
+    fetch('https://ra-api.up.railway.app/update', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -25,7 +25,7 @@ function sendData(coords, label1, label2, zoom) {
 }
 // Function to fetch data from the server
 function fetchData() {
-    fetch('http://localhost:8000/api/get')
+    fetch('https://ra-api.up.railway.app/get')
         .then(function (response) { return response.json(); })
         .then(function (data) {
             // deno-lint-ignore no-explicit-any
