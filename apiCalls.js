@@ -1,34 +1,49 @@
-// deno-lint-ignore no-explicit-any
-function sendData(coords, label1, label2, zoom) {
-    fetch('https://ra-api.up.railway.app/update', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            coordinates: coords,
-            label1Text: label1,
-            label2Text: label2,
-            zoomLevel: zoom // Include the zoom level in the request
+const API_ENDPOINT = "http://localhost:8000"; // Update this dynamically if needed
+
+// Global boolean flag
+let newImageFlag = false;
+
+// Function to check if a new image is available (using promises)
+function checkNewImage() {
+    fetch(`${API_ENDPOINT}/new-image`)
+        .then(response => response.json())
+        .then(data => {
+            newImageFlag = data.newImageAvailable;
         })
+        .catch(error => console.error("Error fetching image data:", error));
+}
+
+function sendTrueBool() {
+    fetch(`${API_ENDPOINT}/image-got`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ imageReceived: true })
     })
-        .then(function (response) {
-            if (response.ok) {
-                console.log("Data sent successfully!");
-            }
-            else {
-                return response.text().then(function (errorText) {
-                    console.error("Failed to send data. Status:", response.status, errorText);
-                });
-            }
-        })["catch"](function (error) { return console.error("Error sending data:", error); });
+        .catch(error => console.error("Error sending data:", error));
 }
-// Function to fetch data from the server
+
+// Function to fetch data from the server (using promises)
 function fetchData() {
-    fetch('https://ra-api.up.railway.app/get')
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            // deno-lint-ignore no-explicit-any
-            window.updateMap(data.coordinates, data.label1Text, data.label2Text, data.zoomLevel);
-        })["catch"](function (error) { return console.error("Error fetching data:", error); });
+    fetch(`${API_ENDPOINT}/get`)
+        .then(response => response.json())
+        .then(data => {
+            if (window.updateMap) {
+                window.updateMap(data.coordinates, data.label1Text, data.label2Text, data.zoomLevel);
+                // Only update image if newImageFlag is true
+                if (newImageFlag) {
+                    window.updateImage(`${API_ENDPOINT}${data.imageUrl}`);
+                    sendTrueBool();
+                }
+            } else {
+                console.error("window.updateMap is not defined");
+            }
+        })
+        .catch(error => console.error("Error fetching data:", error));
 }
+
+// Poll the server every 5 seconds by checking new image flag and fetching data
+setInterval(function () {
+    fetchData();
+}, 5000);
