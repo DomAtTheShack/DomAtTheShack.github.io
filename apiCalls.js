@@ -2,6 +2,7 @@ const API_ENDPOINT = "https://ra-api.up.railway.app"; // Update this dynamically
 
 // Global boolean flag
 let newImageFlag = false;
+let firstBoot = true
 
 // Function to check if a new image is available (using promises)
 function checkNewImage() {
@@ -32,9 +33,10 @@ function fetchData() {
             if (window.updateMap) {
                 window.updateMap(data.coordinates, data.label1Text, data.label2Text, data.zoomLevel);
                 // Only update image if newImageFlag is true
-                if (newImageFlag) {
+                if (newImageFlag || firstBoot) {
                     window.updateImage(`${API_ENDPOINT}${data.imageUrl}`);
                     sendTrueBool();
+                    firstBoot = false;
                 }
             } else {
                 console.error("window.updateMap is not defined");
