@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Ensure proper scaling on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hiragana Test</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.5;
+        }
+        header {
+            background: #336699;
+            color: #fff;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 1.2rem;
+            font-size: 1.2rem;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Question container */
+        .question-container {
+            background: #fff;
+            border: 2px solid #336699;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            padding: 1.5rem;
+            margin: 1rem auto;
+            max-width: 500px;
+            text-align: center;
+        }
+        .question-text {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .instruction {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        .options {
+            margin: 1rem 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .option-btn {
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            background: #eaecef;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .option-btn:hover {
+            background: #dcdcdc;
+        }
+        .written-answer {
+            margin: 1rem 0;
+        }
+        .written-answer input[type="text"] {
+            padding: 0.75rem;
+            font-size: 1.1rem;
+            width: 80%;
+            max-width: 300px;
+        }
+        .submit-btn, .next-btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            background: #336699;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .submit-btn:hover, .next-btn:hover {
+            background: #28527a;
+        }
+        .feedback {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+        }
+        .score {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+        /* Responsive adjustments for mobile */
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            nav a {
+                font-size: 1rem;
+                margin: 0 0.5rem;
+            }
+            .question-text {
+                font-size: 1.5rem;
+            }
+            .option-btn, .submit-btn, .next-btn {
+                font-size: 1rem;
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Hiragana Test</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="learn.html">Learn</a>
+        <a href="test.html">Test</a>
+    </nav>
+</header>
+
+<main>
+    <!-- The test will be rendered in this container -->
+    <div id="testContainer"></div>
+</main>
+
+<script>
+    /* --------------------------
+       Hiragana Data (Flattened)
+    --------------------------- */
+    const hiraganaData = {
+        "Vowels": [
+            { char: "あ", roman: "a", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Hiragana_%E3%81%82_stroke_order_animation.gif/120px-Hiragana_%E3%81%82_stroke_order_animation.gif" },
+            { char: "い", roman: "i", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Hiragana_%E3%81%84_stroke_order_animation.gif/120px-Hiragana_%E3%81%84_stroke_order_animation.gif" },
+            { char: "う", roman: "u", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Hiragana_%E3%81%86_stroke_order_animation.gif/120px-Hiragana_%E3%81%86_stroke_order_animation.gif" },
+            { char: "え", roman: "e", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Hiragana_%E3%81%88_stroke_order_animation.gif/120px-Hiragana_%E3%81%88_stroke_order_animation.gif" },
+            { char: "お", roman: "o", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Hiragana_%E3%81%8A_stroke_order_animation.gif/120px-Hiragana_%E3%81%8A_stroke_order_animation.gif" }
+        ],
+        "K": [
+            { char: "か", roman: "ka", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Hiragana_%E3%81%8B_stroke_order_animation.gif/120px-Hiragana_%E3%81%8B_stroke_order_animation.gif" },
+            { char: "き", roman: "ki", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Hiragana_%E3%81%8D_stroke_order_animation.gif/120px-Hiragana_%E3%81%8D_stroke_order_animation.gif" },
+            { char: "く", roman: "ku", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Hiragana_%E3%81%8F_stroke_order_animation.gif/120px-Hiragana_%E3%81%8F_stroke_order_animation.gif" },
+            { char: "け", roman: "ke", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Hiragana_%E3%81%91_stroke_order_animation.gif/120px-Hiragana_%E3%81%91_stroke_order_animation.gif" },
+            { char: "こ", roman: "ko", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hiragana_%E3%81%93_stroke_order_animation.gif/120px-Hiragana_%E3%81%93_stroke_order_animation.gif" }
+        ],
+        "S": [
+            { char: "さ", roman: "sa", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Hiragana_%E3%81%95_stroke_order_animation.gif/120px-Hiragana_%E3%81%95_stroke_order_animation.gif" },
+            { char: "し", roman: "shi", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Hiragana_%E3%81%97_stroke_order_animation.gif/120px-Hiragana_%E3%81%97_stroke_order_animation.gif" },
+            { char: "す", roman: "su", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hiragana_%E3%81%99_stroke_order_animation.gif/120px-Hiragana_%E3%81%99_stroke_order_animation.gif" },
+            { char: "せ", roman: "se", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Hiragana_%E3%81%9B_stroke_order_animation.gif/120px-Hiragana_%E3%81%9B_stroke_order_animation.gif" },
+            { char: "そ", roman: "so", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Hiragana_%E3%81%9D_stroke_order_animation.gif/120px-Hiragana_%E3%81%9D_stroke_order_animation.gif" }
+        ],
+        "T": [
+            { char: "た", roman: "ta", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Hiragana_%E3%81%9F_stroke_order_animation.gif/120px-Hiragana_%E3%81%9F_stroke_order_animation.gif" },
+            { char: "ち", roman: "chi", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Hiragana_%E3%81%A1_stroke_order_animation.gif/120px-Hiragana_%E3%81%A1_stroke_order_animation.gif" },
+            { char: "つ", roman: "tsu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Hiragana_%E3%81%A4_stroke_order_animation.gif/120px-Hiragana_%E3%81%A4_stroke_order_animation.gif" },
+            { char: "て", roman: "te", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Hiragana_%E3%81%A6_stroke_order_animation.gif/120px-Hiragana_%E3%81%A6_stroke_order_animation.gif" },
+            { char: "と", roman: "to", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Hiragana_%E3%81%A8_stroke_order_animation.gif/120px-Hiragana_%E3%81%A8_stroke_order_animation.gif" }
+        ],
+        "N": [
+            { char: "な", roman: "na", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hiragana_%E3%81%AA_stroke_order_animation.gif/120px-Hiragana_%E3%81%AA_stroke_order_animation.gif" },
+            { char: "に", roman: "ni", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Hiragana_%E3%81%AB_stroke_order_animation.gif/120px-Hiragana_%E3%81%AB_stroke_order_animation.gif" },
+            { char: "ぬ", roman: "nu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hiragana_%E3%81%AC_stroke_order_animation.gif/120px-Hiragana_%E3%81%AC_stroke_order_animation.gif" },
+            { char: "ね", roman: "ne", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Hiragana_%E3%81%AD_stroke_order_animation.gif/120px-Hiragana_%E3%81%AD_stroke_order_animation.gif" },
+            { char: "の", roman: "no", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hiragana_%E3%81%AE_stroke_order_animation.gif/120px-Hiragana_%E3%81%AE_stroke_order_animation.gif" }
+        ],
+        "H": [
+            { char: "は", roman: "ha", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Hiragana_%E3%81%AF_stroke_order_animation.gif/120px-Hiragana_%E3%81%AF_stroke_order_animation.gif" },
+            { char: "ひ", roman: "hi", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Hiragana_%E3%81%B2_stroke_order_animation.gif/120px-Hiragana_%E3%81%B2_stroke_order_animation.gif" },
+            { char: "ふ", roman: "fu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Hiragana_%E3%81%B5_stroke_order_animation.gif/120px-Hiragana_%E3%81%B5_stroke_order_animation.gif" },
+            { char: "へ", roman: "he", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Hiragana_%E3%81%B8_stroke_order_animation.gif/120px-Hiragana_%E3%81%B8_stroke_order_animation.gif" },
+            { char: "ほ", roman: "ho", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Hiragana_%E3%81%BB_stroke_order_animation.gif/120px-Hiragana_%E3%81%BB_stroke_order_animation.gif" }
+        ],
+        "M": [
+            { char: "ま", roman: "ma", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Hiragana_%E3%81%BE_stroke_order_animation.gif/120px-Hiragana_%E3%81%BE_stroke_order_animation.gif" },
+            { char: "み", roman: "mi", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Hiragana_%E3%81%BF_stroke_order_animation.gif/120px-Hiragana_%E3%81%BF_stroke_order_animation.gif" },
+            { char: "む", roman: "mu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Hiragana_%E3%82%80_stroke_order_animation.gif/120px-Hiragana_%E3%82%80_stroke_order_animation.gif" },
+            { char: "め", roman: "me", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Hiragana_%E3%82%81_stroke_order_animation.gif/120px-Hiragana_%E3%82%81_stroke_order_animation.gif" },
+            { char: "も", roman: "mo", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Hiragana_%E3%82%82_stroke_order_animation.gif/120px-Hiragana_%E3%82%82_stroke_order_animation.gif" }
+        ],
+        "Y": [
+            { char: "や", roman: "ya", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Hiragana_%E3%82%84_stroke_order_animation.gif/120px-Hiragana_%E3%82%84_stroke_order_animation.gif" },
+            { char: "ゆ", roman: "yu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Hiragana_%E3%82%86_stroke_order_animation.gif/120px-Hiragana_%E3%82%86_stroke_order_animation.gif" },
+            { char: "よ", roman: "yo", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Hiragana_%E3%82%88_stroke_order_animation.gif/120px-Hiragana_%E3%82%88_stroke_order_animation.gif" }
+        ],
+        "R": [
+            { char: "ら", roman: "ra", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Hiragana_%E3%82%89_stroke_order_animation.gif/120px-Hiragana_%E3%82%89_stroke_order_animation.gif" },
+            { char: "り", roman: "ri", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Hiragana_%E3%82%8A_stroke_order_animation.gif/120px-Hiragana_%E3%82%8A_stroke_order_animation.gif" },
+            { char: "る", roman: "ru", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Hiragana_%E3%82%8B_stroke_order_animation.gif/120px-Hiragana_%E3%82%8B_stroke_order_animation.gif" },
+            { char: "れ", roman: "re", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Hiragana_%E3%82%8C_stroke_order_animation.gif/120px-Hiragana_%E3%82%8C_stroke_order_animation.gif" },
+            { char: "ろ", roman: "ro", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Hiragana_%E3%82%8D_stroke_order_animation.gif/120px-Hiragana_%E3%82%8D_stroke_order_animation.gif" }
+        ],
+        "W": [
+            { char: "わ", roman: "wa", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Hiragana_%E3%82%8F_stroke_order_animation.gif/120px-Hiragana_%E3%82%8F_stroke_order_animation.gif" },
+            { char: "を", roman: "wo", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Hiragana_%E3%82%92_stroke_order_animation.gif/120px-Hiragana_%E3%82%92_stroke_order_animation.gif" }
+        ],
+        "Final": [
+            { char: "ん", roman: "n", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Hiragana_%E3%82%93_stroke_order_animation.gif/120px-Hiragana_%E3%82%93_stroke_order_animation.gif" }
+        ]
+    };
+
+    // Flatten the hiraganaData into a single array of cards
+    function flattenHiraganaData() {
+        let cards = [];
+        for (let group in hiraganaData) {
+            cards = cards.concat(hiraganaData[group]);
+        }
+        return cards;
+    }
+
+    /* --------------------------
+       Test Mode Implementation
+    --------------------------- */
+    let testQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    // Generate 40 questions (or as many as available) from the flattened cards.
+    // Each question randomly chooses a direction ("charToRoman" or "romanToChar")
+    // and a format ("mc" for multiple choice or "written" for a written answer).
+    function generateTestQuestions() {
+        const allCards = flattenHiraganaData();
+        const questions = [];
+        const total = Math.min(40, allCards.length);
+        // Shuffle the cards using Fisher–Yates shuffle
+        let shuffled = allCards.slice();
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        for (let i = 0; i < total; i++) {
+            const card = shuffled[i];
+            // Randomly choose direction: 50% chance each
+            const direction = Math.random() < 0.5 ? "charToRoman" : "romanToChar";
+            // Randomly choose format: 50% chance for multiple choice
+            const format = Math.random() < 0.5 ? "mc" : "written";
+            const question = { card, direction, format };
+            // For MC questions, generate 4 options (including correct answer)
+            if (format === "mc") {
+                let options = [];
+                let correctAnswer = direction === "charToRoman" ? card.roman : card.char;
+                options.push(correctAnswer);
+                while (options.length < 4) {
+                    const randCard = allCards[Math.floor(Math.random() * allCards.length)];
+                    let option = direction === "charToRoman" ? randCard.roman : randCard.char;
+                    if (!options.includes(option)) {
+                        options.push(option);
+                    }
+                }
+                // Shuffle the options
+                for (let i = options.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [options[i], options[j]] = [options[j], options[i]];
+                }
+                question.options = options;
+            }
+            questions.push(question);
+        }
+        return questions;
+    }
+
+    // Render the current test question.
+    function renderTestQuestion() {
+        const container = document.getElementById('testContainer');
+        if (currentQuestionIndex >= testQuestions.length) {
+            container.innerHTML = `<div class="score">Test complete! Your score is ${score} / ${testQuestions.length}.<br><button class="next-btn" onclick="restartTest()">Restart Test</button></div>`;
+            return;
+        }
+        const q = testQuestions[currentQuestionIndex];
+        let questionText = "";
+        if (q.direction === "charToRoman") {
+            questionText = `What is the romanisation for: <strong>${q.card.char}</strong>?`;
+        } else {
+            questionText = `Which Hiragana represents the sound: <strong>${q.card.roman}</strong>?`;
+        }
+        let html = `<div class="question-container">
+      <div class="question-text">${questionText}</div>`;
+        if (q.format === "mc") {
+            html += `<div class="options">`;
+            q.options.forEach(option => {
+                html += `<button class="option-btn" onclick="submitAnswer('${option.replace(/'/g, "\\'")}')">${option}</button>`;
+            });
+            html += `</div>`;
+        } else {
+            html += `<div class="written-answer">
+        <input type="text" id="writtenAnswer" placeholder="Type your answer here">
+      </div>
+      <button class="submit-btn" onclick="submitWrittenAnswer()">Submit Answer</button>`;
+        }
+        html += `<div id="feedback" class="feedback"></div>`;
+        html += `</div>`;
+        container.innerHTML = html;
+    }
+
+    // Multiple choice answer submission
+    function submitAnswer(selected) {
+        const q = testQuestions[currentQuestionIndex];
+        let correctAnswer = q.direction === "charToRoman" ? q.card.roman : q.card.char;
+        const feedbackDiv = document.getElementById('feedback');
+        if (selected === correctAnswer) {
+            feedbackDiv.innerHTML = "<span style='color:green;'>Correct!</span>";
+            score++;
+        } else {
+            feedbackDiv.innerHTML = `<span style='color:red;'>Incorrect! The correct answer is "${correctAnswer}".</span>`;
+        }
+        feedbackDiv.innerHTML += `<br><button class="next-btn" onclick="nextQuestion()">Next</button>`;
+    }
+
+    // Written answer submission
+    function submitWrittenAnswer() {
+        const q = testQuestions[currentQuestionIndex];
+        const input = document.getElementById('writtenAnswer');
+        const userAnswer = input.value.trim();
+        let correctAnswer = q.direction === "charToRoman" ? q.card.roman : q.card.char;
+        const feedbackDiv = document.getElementById('feedback');
+        let isCorrect = false;
+        if (q.direction === "charToRoman") {
+            isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+        } else {
+            isCorrect = userAnswer === correctAnswer;
+        }
+        if (isCorrect) {
+            feedbackDiv.innerHTML = "<span style='color:green;'>Correct!</span>";
+            score++;
+        } else {
+            feedbackDiv.innerHTML = `<span style='color:red;'>Incorrect! The correct answer is "${correctAnswer}".</span>`;
+        }
+        feedbackDiv.innerHTML += `<br><button class="next-btn" onclick="nextQuestion()">Next</button>`;
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        renderTestQuestion();
+    }
+
+    function restartTest() {
+        testQuestions = generateTestQuestions();
+        currentQuestionIndex = 0;
+        score = 0;
+        renderTestQuestion();
+    }
+
+    // Automatically start the test when the DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        testQuestions = generateTestQuestions();
+        currentQuestionIndex = 0;
+        score = 0;
+        renderTestQuestion();
+    });
+</script>
+
+</body>
+</html>

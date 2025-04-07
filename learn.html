@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Ensure proper scaling on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Learn Hiragana</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #fafafa;
+            color: #333;
+        }
+        header {
+            background: #336699;
+            color: #fff;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 1.2rem;
+            font-size: 1.2rem;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            padding: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        /* Selector styling */
+        .selector-container {
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .selector-container select {
+            padding: 0.5rem;
+            font-size: 1.1rem;
+            margin: 0.5rem;
+        }
+        /* Learn grid for static display (used in "Learn All" and "Row" modes) */
+        .learn-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            justify-content: center;
+        }
+        .learn-item {
+            background: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem;
+            text-align: center;
+            width: 120px;
+        }
+        .learn-item .hiragana {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .learn-item .gif img {
+            max-width: 100px;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+        }
+        .learn-item .roman {
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+            color: #555;
+        }
+        h3 {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: #336699;
+        }
+        /* Flashcard Styles */
+        .flashcard-container {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .flashcard {
+            background: #fff;
+            border: 2px solid #336699;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            padding: 2rem;
+            margin: 1rem auto;
+            max-width: 300px;
+            font-size: 3rem;
+            position: relative;
+        }
+        .flashcard .answer {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            color: #555;
+        }
+        .flashcard .gif img {
+            max-width: 120px;
+            display: block;
+            margin: 1rem auto;
+        }
+        .flashcard .timer {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #666;
+        }
+        .flashcard.ready {
+            font-size: 1.8rem;
+            color: #336699;
+        }
+        /* Responsive Styles for Mobile */
+        @media (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            header h1 {
+                font-size: 1.8rem;
+            }
+            nav a {
+                font-size: 1rem;
+                margin: 0 0.5rem;
+            }
+            .selector-container select {
+                font-size: 1rem;
+            }
+            .learn-item {
+                width: 100%;
+                max-width: 150px;
+                padding: 0.75rem;
+            }
+            .flashcard {
+                max-width: 90%;
+                font-size: 2.5rem;
+                padding: 1.5rem;
+            }
+            .flashcard .answer {
+                font-size: 1.2rem;
+            }
+            .flashcard .timer {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Learn Hiragana</h1>
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="learn.html">Learn</a>
+        <a href="test.html">Test</a>
+    </nav>
+</header>
+
+<main>
+    <div class="selector-container">
+        <label for="modeSelector">Select a learning mode: </label>
+        <select id="modeSelector">
+            <option value="all">Learn All Characters</option>
+            <option value="row">Learn a Specific Row</option>
+            <option value="flashcards">Flashcards</option>
+        </select>
+
+        <div id="rowSelection" style="display: none;">
+            <label for="rowSelector">Select row: </label>
+            <select id="rowSelector">
+                <option value="Vowels">Vowels</option>
+                <option value="K">K</option>
+                <option value="S">S</option>
+                <option value="T">T</option>
+                <option value="N">N</option>
+                <option value="H">H</option>
+                <option value="M">M</option>
+                <option value="Y">Y</option>
+                <option value="R">R</option>
+                <option value="W">W</option>
+                <option value="Final">Final</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- This container will display either the learn grid or flashcard mode -->
+    <div id="learnContent"></div>
+</main>
+
+<script>
+    // Data for Hiragana characters grouped by row.
+    const hiraganaData = {
+        "Vowels": [
+            { char: "あ", roman: "a", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Hiragana_%E3%81%82_stroke_order_animation.gif/120px-Hiragana_%E3%81%82_stroke_order_animation.gif" },
+            { char: "い", roman: "i", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Hiragana_%E3%81%84_stroke_order_animation.gif/120px-Hiragana_%E3%81%84_stroke_order_animation.gif" },
+            { char: "う", roman: "u", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Hiragana_%E3%81%86_stroke_order_animation.gif/120px-Hiragana_%E3%81%86_stroke_order_animation.gif" },
+            { char: "え", roman: "e", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Hiragana_%E3%81%88_stroke_order_animation.gif/120px-Hiragana_%E3%81%88_stroke_order_animation.gif" },
+            { char: "お", roman: "o", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Hiragana_%E3%81%8A_stroke_order_animation.gif/120px-Hiragana_%E3%81%8A_stroke_order_animation.gif" }
+        ],
+        "K": [
+            { char: "か", roman: "ka", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Hiragana_%E3%81%8B_stroke_order_animation.gif/120px-Hiragana_%E3%81%8B_stroke_order_animation.gif" },
+            { char: "き", roman: "ki", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Hiragana_%E3%81%8D_stroke_order_animation.gif/120px-Hiragana_%E3%81%8D_stroke_order_animation.gif" },
+            { char: "く", roman: "ku", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Hiragana_%E3%81%8F_stroke_order_animation.gif/120px-Hiragana_%E3%81%8F_stroke_order_animation.gif" },
+            { char: "け", roman: "ke", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Hiragana_%E3%81%91_stroke_order_animation.gif/120px-Hiragana_%E3%81%91_stroke_order_animation.gif" },
+            { char: "こ", roman: "ko", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hiragana_%E3%81%93_stroke_order_animation.gif/120px-Hiragana_%E3%81%93_stroke_order_animation.gif" }
+        ],
+        "S": [
+            { char: "さ", roman: "sa", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Hiragana_%E3%81%95_stroke_order_animation.gif/120px-Hiragana_%E3%81%95_stroke_order_animation.gif" },
+            { char: "し", roman: "shi", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Hiragana_%E3%81%97_stroke_order_animation.gif/120px-Hiragana_%E3%81%97_stroke_order_animation.gif" },
+            { char: "す", roman: "su", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hiragana_%E3%81%99_stroke_order_animation.gif/120px-Hiragana_%E3%81%99_stroke_order_animation.gif" },
+            { char: "せ", roman: "se", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Hiragana_%E3%81%9B_stroke_order_animation.gif/120px-Hiragana_%E3%81%9B_stroke_order_animation.gif" },
+            { char: "そ", roman: "so", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5b/Hiragana_%E3%81%9D_stroke_order_animation.gif/120px-Hiragana_%E3%81%9D_stroke_order_animation.gif" }
+        ],
+        "T": [
+            { char: "た", roman: "ta", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Hiragana_%E3%81%9F_stroke_order_animation.gif/120px-Hiragana_%E3%81%9F_stroke_order_animation.gif" },
+            { char: "ち", roman: "chi", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/32/Hiragana_%E3%81%A1_stroke_order_animation.gif/120px-Hiragana_%E3%81%A1_stroke_order_animation.gif" },
+            { char: "つ", roman: "tsu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Hiragana_%E3%81%A4_stroke_order_animation.gif/120px-Hiragana_%E3%81%A4_stroke_order_animation.gif" },
+            { char: "て", roman: "te", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Hiragana_%E3%81%A6_stroke_order_animation.gif/120px-Hiragana_%E3%81%A6_stroke_order_animation.gif" },
+            { char: "と", roman: "to", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Hiragana_%E3%81%A8_stroke_order_animation.gif/120px-Hiragana_%E3%81%A8_stroke_order_animation.gif" }
+        ],
+        "N": [
+            { char: "な", roman: "na", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Hiragana_%E3%81%AA_stroke_order_animation.gif/120px-Hiragana_%E3%81%AA_stroke_order_animation.gif" },
+            { char: "に", roman: "ni", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Hiragana_%E3%81%AB_stroke_order_animation.gif/120px-Hiragana_%E3%81%AB_stroke_order_animation.gif" },
+            { char: "ぬ", roman: "nu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Hiragana_%E3%81%AC_stroke_order_animation.gif/120px-Hiragana_%E3%81%AC_stroke_order_animation.gif" },
+            { char: "ね", roman: "ne", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Hiragana_%E3%81%AD_stroke_order_animation.gif/120px-Hiragana_%E3%81%AD_stroke_order_animation.gif" },
+            { char: "の", roman: "no", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Hiragana_%E3%81%AE_stroke_order_animation.gif/120px-Hiragana_%E3%81%AE_stroke_order_animation.gif" }
+        ],
+        "H": [
+            { char: "は", roman: "ha", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Hiragana_%E3%81%AF_stroke_order_animation.gif/120px-Hiragana_%E3%81%AF_stroke_order_animation.gif" },
+            { char: "ひ", roman: "hi", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Hiragana_%E3%81%B2_stroke_order_animation.gif/120px-Hiragana_%E3%81%B2_stroke_order_animation.gif" },
+            { char: "ふ", roman: "fu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Hiragana_%E3%81%B5_stroke_order_animation.gif/120px-Hiragana_%E3%81%B5_stroke_order_animation.gif" },
+            { char: "へ", roman: "he", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Hiragana_%E3%81%B8_stroke_order_animation.gif/120px-Hiragana_%E3%81%B8_stroke_order_animation.gif" },
+            { char: "ほ", roman: "ho", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Hiragana_%E3%81%BB_stroke_order_animation.gif/120px-Hiragana_%E3%81%BB_stroke_order_animation.gif" }
+        ],
+        "M": [
+            { char: "ま", roman: "ma", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Hiragana_%E3%81%BE_stroke_order_animation.gif/120px-Hiragana_%E3%81%BE_stroke_order_animation.gif" },
+            { char: "み", roman: "mi", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Hiragana_%E3%81%BF_stroke_order_animation.gif/120px-Hiragana_%E3%81%BF_stroke_order_animation.gif" },
+            { char: "む", roman: "mu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Hiragana_%E3%82%80_stroke_order_animation.gif/120px-Hiragana_%E3%82%80_stroke_order_animation.gif" },
+            { char: "め", roman: "me", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Hiragana_%E3%82%81_stroke_order_animation.gif/120px-Hiragana_%E3%82%81_stroke_order_animation.gif" },
+            { char: "も", roman: "mo", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Hiragana_%E3%82%82_stroke_order_animation.gif/120px-Hiragana_%E3%82%82_stroke_order_animation.gif" }
+        ],
+        "Y": [
+            { char: "や", roman: "ya", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Hiragana_%E3%82%84_stroke_order_animation.gif/120px-Hiragana_%E3%82%84_stroke_order_animation.gif" },
+            { char: "ゆ", roman: "yu", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Hiragana_%E3%82%86_stroke_order_animation.gif/120px-Hiragana_%E3%82%86_stroke_order_animation.gif" },
+            { char: "よ", roman: "yo", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Hiragana_%E3%82%88_stroke_order_animation.gif/120px-Hiragana_%E3%82%88_stroke_order_animation.gif" }
+        ],
+        "R": [
+            { char: "ら", roman: "ra", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Hiragana_%E3%82%89_stroke_order_animation.gif/120px-Hiragana_%E3%82%89_stroke_order_animation.gif" },
+            { char: "り", roman: "ri", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Hiragana_%E3%82%8A_stroke_order_animation.gif/120px-Hiragana_%E3%82%8A_stroke_order_animation.gif" },
+            { char: "る", roman: "ru", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Hiragana_%E3%82%8B_stroke_order_animation.gif/120px-Hiragana_%E3%82%8B_stroke_order_animation.gif" },
+            { char: "れ", roman: "re", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Hiragana_%E3%82%8C_stroke_order_animation.gif/120px-Hiragana_%E3%82%8C_stroke_order_animation.gif" },
+            { char: "ろ", roman: "ro", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Hiragana_%E3%82%8D_stroke_order_animation.gif/120px-Hiragana_%E3%82%8D_stroke_order_animation.gif" }
+        ],
+        "W": [
+            { char: "わ", roman: "wa", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Hiragana_%E3%82%8F_stroke_order_animation.gif/120px-Hiragana_%E3%82%8F_stroke_order_animation.gif" },
+            { char: "を", roman: "wo", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Hiragana_%E3%82%92_stroke_order_animation.gif/120px-Hiragana_%E3%82%92_stroke_order_animation.gif" }
+        ],
+        "Final": [
+            { char: "ん", roman: "n", gif: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Hiragana_%E3%82%93_stroke_order_animation.gif/120px-Hiragana_%E3%82%93_stroke_order_animation.gif" }
+        ]
+    };
+
+    // --- Functions for rendering standard learn grids ---
+    function renderContent(data) {
+        let html = '<div class="learn-grid">';
+        data.forEach(item => {
+            html += `<div class="learn-item">
+        <div class="hiragana">${item.char}</div>
+        <div class="gif"><img src="${item.gif}" alt="${item.char} stroke order"></div>
+        <div class="roman">${item.roman}</div>
+      </div>`;
+        });
+        html += '</div>';
+        return html;
+    }
+
+    function renderAll() {
+        let html = '';
+        for (let group in hiraganaData) {
+            html += `<h3>${group}</h3>`;
+            html += renderContent(hiraganaData[group]);
+        }
+        document.getElementById('learnContent').innerHTML = html;
+    }
+
+    function renderRow(rowName) {
+        if (hiraganaData[rowName]) {
+            let html = `<h3>${rowName} Row</h3>`;
+            html += renderContent(hiraganaData[rowName]);
+            document.getElementById('learnContent').innerHTML = html;
+        } else {
+            document.getElementById('learnContent').innerHTML = `<p>No data available for ${rowName}.</p>`;
+        }
+    }
+
+    // --- Flashcards Mode Variables and Functions ---
+    let flashcards = [];
+    let flashIndex = 0;
+    let flashState = "ready"; // possible states: "ready", "front", "back"
+    let flashStartTime = 0;
+
+    // Generate flashcards array based on selected row(s)
+    function generateFlashcards() {
+        const mode = document.getElementById('modeSelector').value;
+        const rowSelect = document.getElementById('rowSelector').value;
+        let cards = [];
+        if (mode === "flashcards" && rowSelect !== "all") {
+            // Use only the selected row if not "all"
+            if (hiraganaData[rowSelect]) {
+                cards = hiraganaData[rowSelect];
+            }
+        } else {
+            // "all" or no row selected: flatten all groups
+            for (let group in hiraganaData) {
+                cards = cards.concat(hiraganaData[group]);
+            }
+        }
+        return cards;
+    }
+
+    // Render the flashcard display based on flashState and current card
+    function updateFlashcardDisplay() {
+        const container = document.getElementById('learnContent');
+        // When finished, display a "complete" message and set state to "complete"
+        if (flashIndex >= flashcards.length) {
+            container.innerHTML = `<div class="flashcard-container">
+            <div class="flashcard ready">Flashcards complete!<br>Press space to restart.</div>
+        </div>`;
+            flashState = "complete";
+            return;
+        }
+        const card = flashcards[flashIndex];
+        let html = '<div class="flashcard-container">';
+        if (flashState === "ready") {
+            html += `<div class="flashcard ready">Press space to start</div>`;
+        } else if (flashState === "front") {
+            html += `<div class="flashcard" id="flashcardFront">
+            ${card.char}
+            <div class="instruction">Press space to reveal answer</div>
+        </div>`;
+        } else if (flashState === "back") {
+            const elapsed = ((Date.now() - flashStartTime) / 1000).toFixed(2);
+            html += `<div class="flashcard" id="flashcardBack">
+            ${card.char}
+            <div class="answer">${card.roman}</div>
+            <div class="gif"><img src="${card.gif}" alt="${card.char} stroke order"></div>
+            <div class="timer">Time: ${elapsed} s</div>
+            <div class="instruction">Press space for next card</div>
+        </div>`;
+        }
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function shuffleFlashcards() {
+        let cards = generateFlashcards();
+        // Fisher–Yates Shuffle
+        for (let i = cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cards[i], cards[j]] = [cards[j], cards[i]];
+        }
+        return cards;
+    }
+
+
+    function startFlashcards() {
+        flashcards = shuffleFlashcards();
+        flashIndex = 0;
+        flashState = "ready";
+        updateFlashcardDisplay();
+    }
+
+    // Handle spacebar events for flashcards mode
+    document.addEventListener('keydown', function(event) {
+        // Only process if flashcards mode is active
+        if (document.getElementById('modeSelector').value !== "flashcards") return;
+        if (event.code !== "Space") return;
+        event.preventDefault();
+        if (flashState === "complete") {
+            // Restart flashcards when completed
+            startFlashcards();
+        } else if (flashState === "ready") {
+            flashState = "front";
+            flashStartTime = Date.now();
+            updateFlashcardDisplay();
+        } else if (flashState === "front") {
+            flashState = "back";
+            updateFlashcardDisplay();
+        } else if (flashState === "back") {
+            flashIndex++;
+            if (flashIndex < flashcards.length) {
+                flashState = "front";
+                flashStartTime = Date.now();
+                updateFlashcardDisplay();
+            } else {
+                // When we've reached the end, update the display to complete state
+                updateFlashcardDisplay();
+            }
+        }
+    });
+
+
+    // Event listeners for mode and row selection
+    document.addEventListener('DOMContentLoaded', function() {
+        const modeSelector = document.getElementById('modeSelector');
+        const rowSelectionDiv = document.getElementById('rowSelection');
+        const rowSelector = document.getElementById('rowSelector');
+
+        modeSelector.addEventListener('change', function() {
+            if (modeSelector.value === 'all') {
+                rowSelectionDiv.style.display = 'none';
+                renderAll();
+            } else if (modeSelector.value === 'row') {
+                rowSelectionDiv.style.display = 'block';
+                renderRow(rowSelector.value);
+            } else if (modeSelector.value === 'flashcards') {
+                rowSelectionDiv.style.display = 'block';
+                flashState = "ready";
+                startFlashcards();
+            }
+        });
+
+        rowSelector.addEventListener('change', function() {
+            const mode = modeSelector.value;
+            if (mode === "row") {
+                renderRow(rowSelector.value);
+            } else if (mode === "flashcards") {
+                flashState = "ready";
+                startFlashcards();
+            }
+        });
+
+        // Initial render: default to Learn All Characters
+        renderAll();
+    });
+</script>
+
+</body>
+</html>

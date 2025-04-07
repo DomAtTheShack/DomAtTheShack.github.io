@@ -1,0 +1,80 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background: #fafafa;
+}
+header {
+    background: #336699;
+    color: #fff;
+    padding: 1.5rem;
+    text-align: center;
+}
+header h1 {
+    margin: 0;
+    font-size: 2.2rem;
+}
+nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 1.2rem;
+    font-size: 1.2rem;
+}
+nav a:hover {
+    text-decoration: underline;
+}
+main {
+    padding: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+/* Flex container for side-by-side tables */
+.chart-container {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+}
+table {
+    border-collapse: collapse;
+    background: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    text-align: center;
+    vertical-align: middle;
+    min-width: 100px;
+}
+thead th {
+    background: #eaecef;
+    font-weight: bold;
+}
+/* Row labels in the first column */
+tbody th {
+    background: #f4f4f4;
+    width: 60px;
+    font-weight: normal;
+}
+/* For empty cells (e.g. non-existent syllables) */
+.empty {
+    background: #f9f9f9;
+    color: #ccc;
+}
+table img {
+    max-width: 100px;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    th, td {
+        padding: 0.75rem;
+    }
+    table img {
+        max-width: 80px;
+    }
+}
