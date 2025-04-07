@@ -48,6 +48,12 @@
             font-size: 1.1rem;
             margin: 0.5rem;
         }
+        /* Flashcard mode option container */
+        #flashcardOption {
+            display: none;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
         /* Learn grid for static display (used in "Learn All" and "Row" modes) */
         .learn-grid {
             display: flex;
@@ -117,6 +123,11 @@
             font-size: 1.8rem;
             color: #336699;
         }
+        .instruction {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            color: #555;
+        }
         /* Responsive Styles for Mobile */
         @media (max-width: 600px) {
             body {
@@ -185,6 +196,15 @@
                 <option value="R">R</option>
                 <option value="W">W</option>
                 <option value="Final">Final</option>
+            </select>
+        </div>
+
+        <!-- New flashcard mode option -->
+        <div id="flashcardOption" style="display: none;">
+            <label for="flashcardModeSelector">Flashcard Mode: </label>
+            <select id="flashcardModeSelector">
+                <option value="hiraganaFirst">Hiragana First</option>
+                <option value="romanFirst">Romanisation First</option>
             </select>
         </div>
     </div>
@@ -271,10 +291,10 @@
         let html = '<div class="learn-grid">';
         data.forEach(item => {
             html += `<div class="learn-item">
-        <div class="hiragana">${item.char}</div>
-        <div class="gif"><img src="${item.gif}" alt="${item.char} stroke order"></div>
-        <div class="roman">${item.roman}</div>
-      </div>`;
+          <div class="hiragana">${item.char}</div>
+          <div class="gif"><img src="${item.gif}" alt="${item.char} stroke order"></div>
+          <div class="roman">${item.roman}</div>
+        </div>`;
         });
         html += '</div>';
         return html;
@@ -302,8 +322,10 @@
     // --- Flashcards Mode Variables and Functions ---
     let flashcards = [];
     let flashIndex = 0;
-    let flashState = "ready"; // possible states: "ready", "front", "back"
+    let flashState = "ready"; // possible states: "ready", "front", "back", "complete"
     let flashStartTime = 0;
+    // New variable for flashcard display mode; defaults to showing Hiragana first.
+    let flashModeType = "hiraganaFirst";
 
     // Generate flashcards array based on selected row(s)
     function generateFlashcards() {
@@ -311,12 +333,10 @@
         const rowSelect = document.getElementById('rowSelector').value;
         let cards = [];
         if (mode === "flashcards" && rowSelect !== "all") {
-            // Use only the selected row if not "all"
             if (hiraganaData[rowSelect]) {
                 cards = hiraganaData[rowSelect];
             }
         } else {
-            // "all" or no row selected: flatten all groups
             for (let group in hiraganaData) {
                 cards = cards.concat(hiraganaData[group]);
             }
@@ -324,14 +344,13 @@
         return cards;
     }
 
-    // Render the flashcard display based on flashState and current card
+    // Render the flashcard display based on flashState, current card and flashModeType
     function updateFlashcardDisplay() {
         const container = document.getElementById('learnContent');
-        // When finished, display a "complete" message and set state to "complete"
         if (flashIndex >= flashcards.length) {
             container.innerHTML = `<div class="flashcard-container">
-            <div class="flashcard ready">Flashcards complete!<br>Press space or tap to restart.</div>
-        </div>`;
+              <div class="flashcard ready">Flashcards complete!<br>Press space or tap to restart.</div>
+          </div>`;
             flashState = "complete";
             return;
         }
@@ -340,19 +359,26 @@
         if (flashState === "ready") {
             html += `<div class="flashcard ready">Press space or tap to start</div>`;
         } else if (flashState === "front") {
-            html += `<div class="flashcard" id="flashcardFront">
-            ${card.char}
-            <div class="instruction">Press space or tap to reveal answer</div>
-        </div>`;
+            if (flashModeType === "hiraganaFirst") {
+                html += `<div class="flashcard" id="flashcardFront">
+              ${card.char}
+              <div class="instruction">Press space or tap to reveal pronunciation</div>
+          </div>`;
+            } else if (flashModeType === "romanFirst") {
+                html += `<div class="flashcard" id="flashcardFront">
+              ${card.roman}
+              <div class="instruction">Press space or tap to reveal character</div>
+          </div>`;
+            }
         } else if (flashState === "back") {
             const elapsed = ((Date.now() - flashStartTime) / 1000).toFixed(2);
             html += `<div class="flashcard" id="flashcardBack">
-            ${card.char}
-            <div class="answer">${card.roman}</div>
-            <div class="gif"><img src="${card.gif}" alt="${card.char} stroke order"></div>
-            <div class="timer">Time: ${elapsed} s</div>
-            <div class="instruction">Press space or tap for next card</div>
-        </div>`;
+              ${card.char}<br>
+              <div class="roman">(${card.roman})</div>
+              <div class="gif"><img src="${card.gif}" alt="${card.char} stroke order"></div>
+              <div class="timer">Time: ${elapsed} s</div>
+              <div class="instruction">Press space or tap for next card</div>
+          </div>`;
         }
         html += '</div>';
         container.innerHTML = html;
@@ -360,14 +386,12 @@
 
     function shuffleFlashcards() {
         let cards = generateFlashcards();
-        // Fisher–Yates Shuffle
         for (let i = cards.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [cards[i], cards[j]] = [cards[j], cards[i]];
         }
         return cards;
     }
-
 
     function startFlashcards() {
         flashcards = shuffleFlashcards();
@@ -376,7 +400,6 @@
         updateFlashcardDisplay();
     }
 
-    // Define a function to process flashcard actions, triggered by space or tap.
     function processFlashcardAction() {
         if (flashState === "complete") {
             startFlashcards();
@@ -394,11 +417,10 @@
                 flashStartTime = Date.now();
                 updateFlashcardDisplay();
             } else {
-                updateFlashcardDisplay(); // This will trigger the "complete" display.
+                updateFlashcardDisplay();
             }
         }
     }
-
 
     // Handle spacebar events for flashcards mode.
     document.addEventListener('keydown', function(event) {
@@ -410,29 +432,32 @@
 
     // Also handle tap/click events in flashcards mode.
     document.addEventListener('click', function(event) {
-        // Check if we're in flashcards mode and the click occurred within the flashcard container.
         if (document.getElementById('modeSelector').value !== "flashcards") return;
         if (event.target.closest('.flashcard-container')) {
             processFlashcardAction();
         }
     });
 
-
     // Event listeners for mode and row selection
     document.addEventListener('DOMContentLoaded', function() {
         const modeSelector = document.getElementById('modeSelector');
         const rowSelectionDiv = document.getElementById('rowSelection');
         const rowSelector = document.getElementById('rowSelector');
+        const flashcardOptionDiv = document.getElementById('flashcardOption');
+        const flashcardModeSelector = document.getElementById('flashcardModeSelector');
 
         modeSelector.addEventListener('change', function() {
             if (modeSelector.value === 'all') {
                 rowSelectionDiv.style.display = 'none';
+                flashcardOptionDiv.style.display = 'none';
                 renderAll();
             } else if (modeSelector.value === 'row') {
                 rowSelectionDiv.style.display = 'block';
+                flashcardOptionDiv.style.display = 'none';
                 renderRow(rowSelector.value);
             } else if (modeSelector.value === 'flashcards') {
                 rowSelectionDiv.style.display = 'block';
+                flashcardOptionDiv.style.display = 'block';
                 flashState = "ready";
                 startFlashcards();
             }
@@ -443,6 +468,15 @@
             if (mode === "row") {
                 renderRow(rowSelector.value);
             } else if (mode === "flashcards") {
+                flashState = "ready";
+                startFlashcards();
+            }
+        });
+
+        flashcardModeSelector.addEventListener('change', function() {
+            flashModeType = this.value;
+            // Restart flashcards to reflect new mode
+            if (document.getElementById('modeSelector').value === "flashcards") {
                 flashState = "ready";
                 startFlashcards();
             }
