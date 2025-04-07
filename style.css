@@ -69,10 +69,35 @@ table img {
     display: block;
     margin: 0 auto;
 }
-/* Responsive adjustments */
+
+/* Responsive adjustments for mobile */
 @media (max-width: 600px) {
+    header {
+        padding: 1rem;
+    }
+    header h1 {
+        font-size: 1.8rem;
+    }
+    nav a {
+        margin: 0 0.5rem;
+        font-size: 1rem;
+    }
+    main {
+        padding: 1rem;
+    }
+    .chart-container {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+    table {
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        width: 100%;
+    }
     th, td {
         padding: 0.75rem;
+        min-width: auto;
     }
     table img {
         max-width: 80px;
