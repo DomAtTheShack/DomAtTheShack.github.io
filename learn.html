@@ -330,7 +330,7 @@
         // When finished, display a "complete" message and set state to "complete"
         if (flashIndex >= flashcards.length) {
             container.innerHTML = `<div class="flashcard-container">
-            <div class="flashcard ready">Flashcards complete!<br>Press space to restart.</div>
+            <div class="flashcard ready">Flashcards complete!<br>Press space or tap to restart.</div>
         </div>`;
             flashState = "complete";
             return;
@@ -338,11 +338,11 @@
         const card = flashcards[flashIndex];
         let html = '<div class="flashcard-container">';
         if (flashState === "ready") {
-            html += `<div class="flashcard ready">Press space to start</div>`;
+            html += `<div class="flashcard ready">Press space or tap to start</div>`;
         } else if (flashState === "front") {
             html += `<div class="flashcard" id="flashcardFront">
             ${card.char}
-            <div class="instruction">Press space to reveal answer</div>
+            <div class="instruction">Press space or tap to reveal answer</div>
         </div>`;
         } else if (flashState === "back") {
             const elapsed = ((Date.now() - flashStartTime) / 1000).toFixed(2);
@@ -351,7 +351,7 @@
             <div class="answer">${card.roman}</div>
             <div class="gif"><img src="${card.gif}" alt="${card.char} stroke order"></div>
             <div class="timer">Time: ${elapsed} s</div>
-            <div class="instruction">Press space for next card</div>
+            <div class="instruction">Press space or tap for next card</div>
         </div>`;
         }
         html += '</div>';
@@ -376,14 +376,9 @@
         updateFlashcardDisplay();
     }
 
-    // Handle spacebar events for flashcards mode
-    document.addEventListener('keydown', function(event) {
-        // Only process if flashcards mode is active
-        if (document.getElementById('modeSelector').value !== "flashcards") return;
-        if (event.code !== "Space") return;
-        event.preventDefault();
+    // Define a function to process flashcard actions, triggered by space or tap.
+    function processFlashcardAction() {
         if (flashState === "complete") {
-            // Restart flashcards when completed
             startFlashcards();
         } else if (flashState === "ready") {
             flashState = "front";
@@ -399,9 +394,26 @@
                 flashStartTime = Date.now();
                 updateFlashcardDisplay();
             } else {
-                // When we've reached the end, update the display to complete state
-                updateFlashcardDisplay();
+                updateFlashcardDisplay(); // This will trigger the "complete" display.
             }
+        }
+    }
+
+
+    // Handle spacebar events for flashcards mode.
+    document.addEventListener('keydown', function(event) {
+        if (document.getElementById('modeSelector').value !== "flashcards") return;
+        if (event.code !== "Space") return;
+        event.preventDefault();
+        processFlashcardAction();
+    });
+
+    // Also handle tap/click events in flashcards mode.
+    document.addEventListener('click', function(event) {
+        // Check if we're in flashcards mode and the click occurred within the flashcard container.
+        if (document.getElementById('modeSelector').value !== "flashcards") return;
+        if (event.target.closest('.flashcard-container')) {
+            processFlashcardAction();
         }
     });
 

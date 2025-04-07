@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <!-- Ensure proper scaling on mobile devices -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Where is your RA?</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <style>
+    /* Global Styles */
     body, html {
       height: 100%;
       margin: 0;
@@ -15,18 +17,16 @@
     }
     /* Header styling */
     #header {
-      background-color: #000000;
+      background-color: #000;
       padding: 10px;
       display: flex;
       align-items: center;
       flex-shrink: 0;
-      position: relative;
     }
     #logo {
       padding: 10px;
       height: 50px;
       margin-right: 60px;
-      scale: 2;
     }
     #header .static-label {
       flex: 1;
@@ -43,7 +43,7 @@
     /* Left column for the map */
     #map-container {
       flex: 1;
-      border: 2px solid #000000;
+      border: 2px solid #000;
       padding: 10px;
       margin-right: 10px;
     }
@@ -68,9 +68,9 @@
       font-size: 40px;
       margin-bottom: 10px;
     }
-    /* Image styling: slightly bigger than a QR code */
+    /* Image styling */
     #image-container {
-      /* Optional: add a border or margin if desired */
+      /* Optionally add border or margins here */
     }
     #image-display {
       width: 500px;
@@ -80,12 +80,52 @@
     }
     /* Footer styling */
     #footer {
-      background-color: black;
-      color: white;
+      background-color: #000;
+      color: #fff;
       text-align: center;
       padding: 15px;
       flex-shrink: 0;
       font-size: 30px;
+    }
+    /* Responsive Styles for Mobile (600px and below) */
+    @media (max-width: 600px) {
+      /* Stack header content vertically and reduce font sizes */
+      #header {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+      }
+      #logo {
+        margin-right: 0;
+        margin-bottom: 10px;
+        height: 40px;
+      }
+      #header .static-label {
+        font-size: 40px;
+      }
+      /* Stack main columns vertically */
+      #content {
+        flex-direction: column;
+        padding: 10px;
+      }
+      #map-container, #info-container {
+        margin-right: 0;
+        margin-bottom: 20px;
+      }
+      /* Adjust image size */
+      #image-display {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+      }
+      /* Reduce footer font size */
+      #footer {
+        font-size: 20px;
+        padding: 10px;
+      }
+      .dynamic-label {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
@@ -112,7 +152,9 @@
   </div>
 </div>
 
-<div id="footer">Call or Text at (586)-651-0994 or knock at anytime.</div>
+<div id="footer">
+  Call or Text at (586)-651-0994 or knock at anytime.
+</div>
 
 <script src="apiCalls.js"></script>
 <script>
@@ -125,7 +167,7 @@
 
   var marker = L.marker([37.7749, -122.4194]).addTo(map);
 
-  // Update the map and dynamic labels
+  // Function to update the map and dynamic labels.
   window.updateMap = function(coordinates, label1Text, label2Text, zoom) {
     map.setView(coordinates, zoom);
     document.getElementById('label1').innerText = label1Text;
@@ -133,29 +175,28 @@
     marker.setLatLng(coordinates);
   };
 
-  // Update the image on the right column underneath the labels
+  // Function to update the image and its clickable link.
   window.updateImage = function(imgSRC) {
     const imageElement = document.getElementById("image-display");
     const linkElement = document.getElementById("image-link");
 
     if (imgSRC) {
       imageElement.src = imgSRC;
-      linkElement.href = imgSRC; // Update the clickable link
+      linkElement.href = imgSRC;
     } else {
       imageElement.src = "";
       linkElement.href = "#";
     }
   };
 
+  // Optional auto-refresh every 10 minutes
   setInterval(() => {
     location.reload();
-  }, 300000); // Refreshes every 10 minutes
+  }, 300000);
 
-
-  // Fetch data every second
+  // Data fetching functions (assumed to be defined in apiCalls.js)
   setInterval(fetchData, 1000);
   setInterval(checkNewImage, 1000);
-
 </script>
 </body>
 </html>
