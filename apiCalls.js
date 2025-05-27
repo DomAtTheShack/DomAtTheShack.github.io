@@ -1,4 +1,4 @@
-const API_ENDPOINT = "https://ra-api.up.railway.app"; // Update this dynamically if needed
+const API_ENDPOINT = "https://socks.domserver.xyz"; // Update this dynamically if needed
 
 // Global boolean flag
 let newImageFlag = false;
