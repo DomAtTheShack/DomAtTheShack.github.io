@@ -1,4 +1,4 @@
-const API_ENDPOINT = "https://cors-proxy-socks.dominic-fd8.workers.dev/"; // Update this dynamically if needed
+const API_ENDPOINT = "https://cors-proxy.dominic-fd8.workers.dev"; // Update this dynamically if needed
 
 // Global boolean flag
 let newImageFlag = false;
