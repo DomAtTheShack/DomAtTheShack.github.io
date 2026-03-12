@@ -170,7 +170,7 @@ export default function RATracker() {
 
                 {/* Footer */}
                 <div className="footer" style={{ backgroundColor: "#000", color: "#fff", textAlign: "center", padding: 15, flexShrink: 0, fontSize: 30 }}>
-                    Call or Text at (586)-651-0994 or knock if not busy.
+                    Call or Text at (734)-430-0220 or knock if not busy.
                 </div>
 
             </div>
