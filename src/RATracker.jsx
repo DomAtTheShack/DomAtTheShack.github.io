@@ -45,7 +45,6 @@ export default function RATracker() {
         document.head.appendChild(script);
     }, [initMap]);
 
-    // Set favicon
     useEffect(() => {
         const favicon = document.querySelector("link[rel~='icon']") || document.createElement("link");
         favicon.rel = "icon";
@@ -92,19 +91,19 @@ export default function RATracker() {
                     </div>
                 </div>
 
-                {/* Main content — all boxes share the same top/bottom edges */}
+                {/* Main content */}
                 <div className="content-area" style={{
                     display: "flex",
                     flex: 1,
                     padding: 25,
                     gap: 20,
                     overflow: "hidden",
-                    alignItems: "stretch",   /* all columns stretch to the same height */
+                    alignItems: "stretch",
                 }}>
 
-                    {/* Left — Map, fills full column height */}
+                    {/* Left — Map: flex 3 (~43% of width) */}
                     <div style={{
-                        flex: 1,
+                        flex: 3,
                         border: "2px solid #000",
                         padding: 10,
                         display: "flex",
@@ -113,9 +112,9 @@ export default function RATracker() {
                         <div ref={mapRef} style={{ flex: 1, width: "100%" }} />
                     </div>
 
-                    {/* Right — label box + image box stacked, same total height as map */}
+                    {/* Right — Labels + Image: flex 4 (~57% of width) */}
                     <div style={{
-                        flex: 2,
+                        flex: 4,
                         display: "flex",
                         flexDirection: "column",
                         gap: 20,
@@ -148,7 +147,7 @@ export default function RATracker() {
                             </div>
                         </div>
 
-                        {/* Image — grows to fill remaining height, aligned with bottom of map */}
+                        {/* Image */}
                         <div style={{
                             flex: 1,
                             border: "2px solid #000",
